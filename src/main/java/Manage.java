@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Apple on 11/3/2016 AD.
@@ -8,15 +10,21 @@ public class Manage {
     static List<Long> success = new ArrayList<>();
     static int failed;
     static int complete;
+    private static List<Long> percentile = new ArrayList<>();
+
     static List<Long> avgTime = new ArrayList<>();
-    public Manage(long time){
+
+    public static synchronized void reportResponse(long time) {
         failed += 1;
         avgTime.add(time);
+        percentile.add(time);
 //        System.out.println("FAILEDDD");
     }
-    public Manage(int error,long time){
+
+    public static synchronized void reportResponse(int error,long time) {
         String a = String.valueOf(error);
         avgTime.add(time);
+        percentile.add(time);
 
 
         if (a.startsWith("2")){
@@ -29,11 +37,16 @@ public class Manage {
             failed += 1;
 
         }
-
-
     }
 
+    public static List<Long> getSortedResponseTimes() {
+        List<Long> responseTimes = new ArrayList<>(percentile);
+        Collections.sort(responseTimes);
 
-    public static void main(String[] args) {
+        return responseTimes;
     }
+//    static void printPArray() {
+//        System.out.printf("size: %d\n", percentile.size());
+//        System.out.println(percentile.toString());
+//    }
 }

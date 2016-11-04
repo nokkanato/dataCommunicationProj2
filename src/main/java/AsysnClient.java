@@ -20,9 +20,9 @@ import org.apache.http.impl.nio.client.HttpAsyncClients;
  * where the result of an individual operation is reported using a callback interface.
  */
 public class AsysnClient implements Callable<List<HashMap<String, String>>> {
-    static List<Manage> mangeLst = new ArrayList<>();
 
     static int counter =0;
+    static ThreadPool a = new ThreadPool();
     @Override
     public List<HashMap<String, String>> call() throws Exception {
         return run();
@@ -43,8 +43,9 @@ public class AsysnClient implements Callable<List<HashMap<String, String>>> {
                 .build();
         try {
             httpclient.start();
-            List<HttpGet> http = new ArrayList<>();
-            for (int x = 0; x<1000000/200; x++){
+            List<HttpGet> http = new ArrayList<HttpGet>();
+            for (int x = 0; x<a.numm/a.conn; x++){
+//                http.add(new HttpGet("http://lgu1.fishcluster.local:9000/fire"));
                 http.add(new HttpGet("http://10.27.8.20:8080"));
             }
 
@@ -61,41 +62,36 @@ public class AsysnClient implements Callable<List<HashMap<String, String>>> {
                         latch.countDown();
                         counter += 1;
                         int code = response.getStatusLine().getStatusCode();
-                        mangeLst.add(new Manage(code, System.nanoTime()-startTime));
+                        Manage.reportResponse(code, System.nanoTime()-startTime);
 //
                     }
 
                     @Override
                     public void failed(final Exception ex) {
                         latch.countDown();
-//                        System.out.println("FAILED");
 
 
-                        mangeLst.add(new Manage(System.nanoTime()-startTime));
+                        Manage.reportResponse(System.nanoTime()-startTime);
 
 //                        TODO: How to measure time
 //                        TODO: System.nanoTime();
 
 
 
-//                        System.out.println(request.getRequestLine() + "->" + ex);
                     }
 
                     @Override
                     public void cancelled() {
                         latch.countDown();
-//                        System.out.println(request.getRequestLine() + " cancelled");
-                        mangeLst.add(new Manage(System.nanoTime()-startTime));
+                        Manage.reportResponse(System.nanoTime()-startTime);
                     }
                 });
             }
             latch.await();
-            System.out.println("Shutting down");
         } finally {
             httpclient.close();
         }
-        System.out.println("Done");
-        System.out.println(counter);
+//
 
         return result;
 
