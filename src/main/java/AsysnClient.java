@@ -43,10 +43,14 @@ public class AsysnClient implements Callable<List<HashMap<String, String>>> {
                 .build();
         try {
             httpclient.start();
+            HttpGet httpGet = new HttpGet();
+            httpGet.addHeader("P2Tag","u5680412_u5780464");
             List<HttpGet> http = new ArrayList<HttpGet>();
+
             for (int x = 0; x<a.numm/a.conn; x++){
-//                http.add(new HttpGet("http://lgu1.fishcluster.local:9000/fire"));
-                http.add(new HttpGet("http://10.27.8.20:8080"));
+                http.add(new HttpGet("http://lgu1.fishcluster.local:9000/fire"));
+
+//                http.add(new HttpGet("http://10.27.8.20:8080"));
             }
 
             final CountDownLatch latch = new CountDownLatch(http.size());
